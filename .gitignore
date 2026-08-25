@@ -6,3 +6,5 @@ __pycache__/
 # portrait sources & intermediates stay local
 source-photo.*
 source-prepped.png
+*.jpg
+*.jpeg
