@@ -1,0 +1,5 @@
+# portrait-only deps (run locally; not needed by the daily workflow)
+pillow
+numpy
+opencv-python
+rembg

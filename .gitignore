@@ -1,0 +1,8 @@
+# local python
+.venv/
+__pycache__/
+*.pyc
+
+# portrait sources & intermediates stay local
+source-photo.*
+source-prepped.png
