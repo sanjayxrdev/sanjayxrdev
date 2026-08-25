@@ -7,8 +7,9 @@ A flatly-lit face converts to a dark, unreadable blob, so:
   3. composite onto pure white so the background maps to the blank
      end of the density ramp
 
-Usage: python scripts/prep_photo.py source-photo.jpg [-o out.png]
-Output: grayscale source-prepped.png next to the input."""
+Usage: python scripts/prep_photo.py [input] [-o out.png]
+Output: grayscale source-prepped.png next to the input.
+Default input: pfp.jpeg in the repo root."""
 
 import argparse
 import sys
@@ -16,10 +17,12 @@ from pathlib import Path
 
 import numpy as np
 
+ROOT = Path(__file__).resolve().parent.parent
+
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("photo", help="input photo (jpg/png)")
+    ap.add_argument("photo", nargs="?", default=str(ROOT / "pfp.jpeg"), help="input photo (jpg/png)")
     ap.add_argument("-o", "--out", default=None, help="output png path")
     args = ap.parse_args()
 
