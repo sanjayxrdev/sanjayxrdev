@@ -1,42 +1,35 @@
 name: Update Profile Daily
 
 on:
-  # Run daily at 00:00 UTC
   schedule:
     - cron: '0 0 * * *'
-  
-  # Allow manual trigger from Actions tab
+
   workflow_dispatch:
 
 permissions:
   contents: write
-  actions: read
 
 jobs:
   update-profile:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: scripts/requirements.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r scripts/requirements.txt
-          pip install -r scripts/requirements-portrait.txt
-
-      - name: Prep photo for ASCII conversion
-        run: |
-          python scripts/prep_photo.py
 
       - name: Fetch contributions
         run: |
@@ -46,33 +39,27 @@ jobs:
         run: |
           python scripts/render_heatmap_svg.py
 
-      - name: Generate ASCII SVG
-        run: |
-          python scripts/make_ascii_svg.py
-
-      - name: Generate info card
-        run: |
-          python scripts/make_info_card.py
-
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          if git diff --quiet; then
+
+          git add data/contributions.json contrib-heatmap.svg
+
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git add -A
-            git commit -m "chore: update profile SVGs [automated]"
+            git commit -m "chore: update contribution heatmap"
             git push
           fi
 
-      - name: Upload artifacts (optional)
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: profile-artifacts
+          name: contribution-heatmap
           path: |
-            data/
-            assets/
+            data/contributions.json
+            contrib-heatmap.svg
+          if-no-files-found: warn
           retention-days: 7
